@@ -200,6 +200,7 @@ export default function LandingFilandia() {
               { src: "/g4.jpg", alt: "Balcón con vista" },
               { src: "/g5.jpg", alt: "Baño moderno" },
               { src: "/g6.jpg", alt: "Detalle de decoración" },
+              { src: "/g7.jpg", alt: "Detalle de decoración" },
             ].map((img) => (
               <div key={img.src} className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-sm">
                 <Image src={img.src} alt={img.alt} fill className="object-cover hover:scale-105 transition" />
