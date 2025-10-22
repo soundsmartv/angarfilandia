@@ -151,25 +151,28 @@ function ZoomableImage({ src, alt }: { src: string; alt: string }) {
   const onPointerUp = () => (last.current.panning = false);
 
   const getDist = (t: TouchList) => {
-    const dx = t[0].clientX - t[1].clientX;
-    const dy = t[0].clientY - t[1].clientY;
-    return Math.hypot(dx, dy);
-  };
+  const dx = t[0].clientX - t[1].clientX;
+  const dy = t[0].clientY - t[1].clientY;
+  return Math.hypot(dx, dy);
+};
 
-  const onTouchStart = (e: React.TouchEvent) => {
-    if (e.touches.length === 2) {
-      last.current.dist = getDist(e.touches);
-    }
-  };
-  const onTouchMove = (e: React.TouchEvent) => {
-    if (e.touches.length === 2) {
-      e.preventDefault();
-      const dist = getDist(e.touches);
-      const delta = (dist - last.current.dist) / 300;
-      last.current.dist = dist;
-      setScale((s) => Math.min(4, Math.max(1, s + delta)));
-    }
-  };
+  const onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+  const t = e.nativeEvent.touches;
+  if (t.length === 2) {
+    last.current.dist = getDist(t);
+  }
+};
+
+const onTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+  const t = e.nativeEvent.touches;
+  if (t.length === 2) {
+    e.preventDefault();
+    const dist = getDist(t);
+    const delta = (dist - last.current.dist) / 300;
+    last.current.dist = dist;
+    setScale((s) => Math.min(4, Math.max(1, s + delta)));
+  }
+};
 
   return (
     <div
