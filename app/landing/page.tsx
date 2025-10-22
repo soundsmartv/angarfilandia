@@ -268,12 +268,14 @@ export default function LandingFilandia() {
   };
 
   useEffect(() => {
-    if (selectedIndex !== null) {
-      const prev = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      return () => (document.body.style.overflow = prev);
-    }
-  }, [selectedIndex]);
+  if (selectedIndex !== null) {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev; // <- limpiar sin retornar string
+    };
+  }
+}, [selectedIndex]);
 
   useEffect(() => {
     if (selectedIndex === null) return;
