@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   MapPin,
@@ -16,32 +15,23 @@ import {
   Images,
   Star,
   PhoneCall,
-  ArrowRight,
 } from "lucide-react";
+import { useState } from "react";
 
 // =====================
-// CONFIG GLOBAL
+// CONFIG GLOBAL (sin enlaces externos)
 // =====================
 const CONFIG = {
-  brand: "Mirador del Café · Filandia",
-  airbnbUrl: "https://airbnb.com/h/tu-anuncio", // ⇐ REEMPLAZA
-  whatsappNumber: "+57 3000000000", // ⇐ REEMPLAZA (formato internacional)
-  whatsappMsg:
-    "Hola, me interesa reservar en Mirador del Café (Filandia). ¿Tienes disponibilidad?",
+  brand: "Apartamento Dúplex en Filandia",
+  whatsappNumber: "+57 311 764 4679", // mostrado, SIN enlace
   addressShort: "Filandia, Quindío – Colombia",
-  capacity: "4 huéspedes",
+  capacity: "6 huéspedes",
   beds: "2 camas",
   baths: "2 baños",
   wifi: "100 Mbps",
   mapEmbedUrl:
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3978.720785802847!2d-75.6585!3d4.6745!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e388e5a2e9a4fef%3A0x16dcf5d8c6d8a3b6!2sFilandia%2C%20Quind%C3%ADo!5e0!3m2!1ses!2sco!4v1700000000000",
 };
-
-// Utilidad: genera el link de WhatsApp limpio
-function getWhatsappHref() {
-  const phone = CONFIG.whatsappNumber.replace(/[^\d]/g, "");
-  return `https://wa.me/${phone}?text=${encodeURIComponent(CONFIG.whatsappMsg)}`;
-}
 
 // =====================
 // SUBCOMPONENTES
@@ -64,12 +54,8 @@ function SectionTitle({
           {eyebrow}
         </p>
       )}
-      <h2 className="text-2xl md:text-3xl font-semibold text-stone-800">
-        {title}
-      </h2>
-      {subtitle && (
-        <p className="text-stone-600 mt-3 leading-relaxed">{subtitle}</p>
-      )}
+      <h2 className="text-2xl md:text-3xl font-semibold text-stone-800">{title}</h2>
+      {subtitle && <p className="text-stone-600 mt-3 leading-relaxed">{subtitle}</p>}
     </div>
   );
 }
@@ -115,54 +101,27 @@ function Review({
         ))}
       </div>
       <p className="text-stone-700 leading-relaxed">“{text}”</p>
-      <p className="text-sm text-stone-500 mt-3">
-        — {name}
-        {city ? `, ${city}` : ""}
-      </p>
+      <p className="text-sm text-stone-500 mt-3">— {name}{city ? `, ${city}` : ""}</p>
     </div>
   );
 }
 
-function ButtonPrimary({
-  href,
-  children,
-  newTab = true,
-}: {
-  href: string;
-  children: React.ReactNode;
-  newTab?: boolean;
-}) {
-  return (
-    <Link href={href} target={newTab ? "_blank" : undefined} className="inline-block">
-      <span className="px-5 py-3 rounded-2xl bg-emerald-600 text-white font-medium shadow hover:opacity-95 inline-flex items-center gap-2">
-        {children}
-      </span>
-    </Link>
-  );
-}
-
-function ButtonSecondary({
-  href,
-  children,
-  newTab = true,
-}: {
-  href: string;
-  children: React.ReactNode;
-  newTab?: boolean;
-}) {
-  return (
-    <Link href={href} target={newTab ? "_blank" : undefined} className="inline-block">
-      <span className="px-5 py-3 rounded-2xl border border-stone-300 text-stone-800 font-medium hover:bg-stone-50 inline-flex items-center gap-2">
-        {children}
-      </span>
-    </Link>
-  );
-}
-
 // =====================
-// PÁGINA
+// PÁGINA (sin enlaces de reserva. WhatsApp solo como dato visual + copiar)
 // =====================
 export default function LandingFilandia() {
+  const [copied, setCopied] = useState(false);
+
+  const copyWhatsapp = async () => {
+    try {
+      await navigator.clipboard.writeText(CONFIG.whatsappNumber);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch (e) {
+      // no-op
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 via-emerald-50/40 to-white text-stone-800">
       {/* Header */}
@@ -173,82 +132,52 @@ export default function LandingFilandia() {
             <span className="font-semibold">{CONFIG.brand}</span>
           </div>
           <nav className="hidden md:flex items-center gap-4 text-sm text-stone-600">
-            <Link href="#fotos">Fotos</Link>
-            <Link href="#servicios">Servicios</Link>
-            <Link href="#ubicacion">Ubicación</Link>
-            <Link href="#resenas">Reseñas</Link>
+            <span className="opacity-70">Fotos</span>
+            <span className="opacity-70">Servicios</span>
+            <span className="opacity-70">Ubicación</span>
+            <span className="opacity-70">Reseñas</span>
           </nav>
-          <ButtonPrimary href={CONFIG.airbnbUrl}>
-            Reservar en Airbnb <ArrowRight className="w-4 h-4" />
-          </ButtonPrimary>
         </div>
       </header>
-
-      {/* CTA flotante móvil */}
-      <div className="fixed bottom-4 left-0 right-0 z-40 px-4 md:hidden">
-        <ButtonPrimary href={CONFIG.airbnbUrl}>Reservar en Airbnb</ButtonPrimary>
-      </div>
 
       {/* HERO */}
       <section className="relative">
         <div className="relative h-[62vh] md:h-[78vh] w-full overflow-hidden">
-          <Image
-            src="/hero.png" // ⇐ pon tu foto principal en public/hero.png 
-            alt="Vista balcón Filandia"
-            fill
-            className="object-cover"
-            priority
-          />
+          <Image src="/hero01.jpg" alt="Vista balcón Filandia" fill className="object-cover" priority />
           <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-black/10" />
           <div className="absolute inset-x-0 bottom-0 pb-24 md:pb-16 px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="max-w-3xl text-white"
-            >
-              <p className="text-sm tracking-widest uppercase text-emerald-200/90">
-                {CONFIG.addressShort}
-              </p>
-              <h1 className="text-3xl md:text-5xl font-semibold leading-tight mt-2">
-                Vive la magia del Eje Cafetero
-              </h1>
-              <p className="mt-3 text-white/90 max-w-xl">
-                Dúplex con parqueadero privado, balcón con vista y todo lo necesario para descansar en Filandia.
-              </p>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-3xl text-white">
+              <p className="text-sm tracking-widest uppercase text-emerald-200/90">{CONFIG.addressShort}</p>
+              <h1 className="text-3xl md:text-5xl font-semibold leading-tight mt-2">Tu descanso en Filandia</h1>
+              <p className="mt-3 text-white/90 max-w-xl">Dúplex con parqueadero privado, balcón con vista y todo lo necesario para desconectar en el Eje Cafetero.</p>
               <div className="flex flex-wrap gap-2 mt-4 text-sm text-white/90">
-                <span className="inline-flex items-center gap-1 bg-white/10 rounded-full px-3 py-1">
-                  <BedDouble className="w-4 h-4" /> {CONFIG.beds}
-                </span>
-                <span className="inline-flex items-center gap-1 bg-white/10 rounded-full px-3 py-1">
-                  <Bath className="w-4 h-4" /> {CONFIG.baths}
-                </span>
-                <span className="inline-flex items-center gap-1 bg-white/10 rounded-full px-3 py-1">
-                  <Wifi className="w-4 h-4" /> {CONFIG.wifi}
-                </span>
-                <span className="inline-flex items-center gap-1 bg-white/10 rounded-full px-3 py-1">
-                  <DoorOpen className="w-4 h-4" /> {CONFIG.capacity}
-                </span>
-              </div>
-              <div className="mt-5 flex gap-3 flex-wrap">
-                <ButtonPrimary href={CONFIG.airbnbUrl}>Reservar en Airbnb</ButtonPrimary>
-                <ButtonSecondary href={getWhatsappHref()}>
-                  <PhoneCall className="w-4 h-4" />
-                  WhatsApp
-                </ButtonSecondary>
+                <span className="inline-flex items-center gap-1 bg-white/10 rounded-full px-3 py-1"><BedDouble className="w-4 h-4" /> {CONFIG.beds}</span>
+                <span className="inline-flex items-center gap-1 bg-white/10 rounded-full px-3 py-1"><Bath className="w-4 h-4" /> {CONFIG.baths}</span>
+                <span className="inline-flex items-center gap-1 bg-white/10 rounded-full px-3 py-1"><Wifi className="w-4 h-4" /> {CONFIG.wifi}</span>
+                <span className="inline-flex items-center gap-1 bg-white/10 rounded-full px-3 py-1"><DoorOpen className="w-4 h-4" /> {CONFIG.capacity}</span>
               </div>
             </motion.div>
           </div>
         </div>
       </section>
 
+      {/* WHATSAPP FLOTANTE (sin enlace): muestra y copia número */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button onClick={copyWhatsapp} className="flex items-center gap-2 rounded-full bg-emerald-600 text-white px-4 py-3 shadow-lg hover:opacity-95 active:scale-[0.99]">
+          <PhoneCall className="w-5 h-5" />
+          <span className="text-sm font-medium">Más información</span>
+        </button>
+        <div className="mt-2 text-[11px] text-stone-700 bg-white/90 rounded-full px-3 py-1 border border-emerald-100 shadow-sm">{CONFIG.whatsappNumber}</div>
+        {copied && (
+          <div className="mt-2 text-xs text-emerald-900 bg-emerald-100 rounded-full px-3 py-1 shadow-sm">
+            Número copiado al portapapeles
+          </div>
+        )}
+      </div>
+
       {/* POR QUÉ ELEGIRNOS */}
       <section className="max-w-6xl mx-auto px-4 py-14" id="ventajas">
-        <SectionTitle
-          eyebrow="Confort + Ubicación"
-          title="Detalles que hacen la diferencia"
-          subtitle="Todo lo que necesitas para una estadía cómoda y memorable."
-        />
+        <SectionTitle eyebrow="Confort + Ubicación" title="Detalles que hacen la diferencia" subtitle="Todo lo que necesitas para una estadía cómoda y memorable." />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Feature icon={Mountain} title="Vista panorámica" desc="Balcón con montañas y atardeceres únicos." />
           <Feature icon={Car} title="Parqueadero privado" desc="Tu vehículo seguro y a la mano." />
@@ -277,11 +206,6 @@ export default function LandingFilandia() {
               </div>
             ))}
           </div>
-          <div className="text-center mt-6">
-            <ButtonSecondary href={CONFIG.airbnbUrl}>
-              Ver más en Airbnb <Images className="w-4 h-4" />
-            </ButtonSecondary>
-          </div>
         </div>
       </section>
 
@@ -300,13 +224,6 @@ export default function LandingFilandia() {
               <li>• Baños: {CONFIG.baths}</li>
               <li>• Internet: {CONFIG.wifi}</li>
             </ul>
-            <div className="mt-6 flex gap-3 flex-wrap">
-              <ButtonPrimary href={CONFIG.airbnbUrl}>Reservar ahora</ButtonPrimary>
-              <ButtonSecondary href={getWhatsappHref()}>
-                <PhoneCall className="w-4 h-4" />
-                WhatsApp
-              </ButtonSecondary>
-            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[
@@ -331,39 +248,18 @@ export default function LandingFilandia() {
       {/* UBICACIÓN */}
       <section className="bg-emerald-50/60 py-14" id="ubicacion">
         <div className="max-w-6xl mx-auto px-4">
-          <SectionTitle
-            eyebrow="Ubicación"
-            title="En el corazón del Quindío"
-            subtitle="Cerca del mirador, cafés artesanales y restaurantes típicos."
-          />
+          <SectionTitle eyebrow="Ubicación" title="En el corazón del Quindío" subtitle="Cerca del mirador, cafés artesanales y restaurantes típicos." />
           <div className="grid md:grid-cols-2 gap-6 items-stretch">
             <div className="rounded-2xl overflow-hidden shadow">
-              <iframe
-                src={CONFIG.mapEmbedUrl}
-                width="100%"
-                height="360"
-                loading="lazy"
-                className="border-0"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+              <iframe src={CONFIG.mapEmbedUrl} width="100%" height="360" loading="lazy" className="border-0" referrerPolicy="no-referrer-when-downgrade" />
             </div>
             <div className="space-y-3 text-stone-700">
-              <p>
-                Base perfecta para recorrer el Eje Cafetero: Salento, Valle de Cocora y pueblos con encanto están a un
-                corto trayecto.
-              </p>
+              <p>Base perfecta para recorrer el Eje Cafetero: Salento, Valle de Cocora y pueblos con encanto están a un corto trayecto.</p>
               <ul className="space-y-2">
                 <li>• Mirador de Filandia</li>
                 <li>• Parque principal y cafés</li>
                 <li>• Transporte a Salento y Cocora</li>
               </ul>
-              <div className="pt-2 flex gap-3 flex-wrap">
-                <ButtonPrimary href={CONFIG.airbnbUrl}>Ver disponibilidad</ButtonPrimary>
-                <ButtonSecondary href={getWhatsappHref()}>
-                  <PhoneCall className="w-4 h-4" />
-                  WhatsApp
-                </ButtonSecondary>
-              </div>
             </div>
           </div>
         </div>
@@ -373,49 +269,25 @@ export default function LandingFilandia() {
       <section className="max-w-6xl mx-auto px-4 py-14" id="resenas">
         <SectionTitle eyebrow="Opiniones" title="Nuestros huéspedes lo dicen" />
         <div className="grid md:grid-cols-3 gap-4">
-          <Review
-            name="Laura"
-            city="Bogotá"
-            text="El lugar es increíble, todo limpio y con una vista espectacular. Volvería sin pensarlo."
-          />
-          <Review
-            name="Carlos"
-            city="Medellín"
-            text="Perfecto para descansar y trabajar remoto. Tiene todo lo necesario."
-          />
-          <Review
-            name="Sophie"
-            city="Francia"
-            text="Decoración hermosa y atención excelente. Muy recomendado."
-          />
-        </div>
-        <div className="text-center mt-6">
-          <ButtonSecondary href={CONFIG.airbnbUrl}>Ver más reseñas en Airbnb</ButtonSecondary>
+          <Review name="Laura" city="Bogotá" text="El lugar es increíble, todo limpio y con una vista espectacular. Volvería sin pensarlo." />
+          <Review name="Carlos" city="Medellín" text="Perfecto para descansar y trabajar remoto. Tiene todo lo necesario." />
+          <Review name="Sophie" city="Francia" text="Decoración hermosa y atención excelente. Muy recomendado." />
         </div>
       </section>
 
-      {/* CTA FINAL */}
+      {/* CTA FINAL SIN ENLACES */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-[url('/cta-texture.jpg')] bg-cover bg-center opacity-10" />
         <div className="max-w-6xl mx-auto px-4 py-16 text-center">
-          <h3 className="text-2xl md:text-3xl font-semibold">¿Listo para tu estadía en Filandia?</h3>
-          <p className="text-stone-600 mt-2">Reserva con confianza a través de Airbnb o escríbenos por WhatsApp.</p>
-          <div className="mt-5 flex justify-center gap-3 flex-wrap">
-            <ButtonPrimary href={CONFIG.airbnbUrl}>Reservar en Airbnb</ButtonPrimary>
-            <ButtonSecondary href={getWhatsappHref()}>
-              <PhoneCall className="w-4 h-4" />
-              WhatsApp
-            </ButtonSecondary>
-          </div>
+          <h3 className="text-2xl md:text-3xl font-semibold">Conoce tu próximo hospedaje en Filandia</h3>
+          <p className="text-stone-600 mt-2">Naturaleza, comodidad y una vista que enamora. Sin enlaces externos, información clara y transparente.</p>
         </div>
       </section>
 
       {/* FOOTER */}
       <footer className="border-t border-emerald-100 bg-white/60">
         <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-3">
-          <p className="text-sm">
-            © {new Date().getFullYear()} {CONFIG.brand}. Todos los derechos reservados.
-          </p>
+          <p className="text-sm">© {new Date().getFullYear()} {CONFIG.brand}. Todos los derechos reservados.</p>
           <div className="text-sm text-stone-600 flex items-center gap-2">
             <MapPin className="w-4 h-4" /> {CONFIG.addressShort}
           </div>
